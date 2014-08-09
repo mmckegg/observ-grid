@@ -60,6 +60,7 @@ The grid itself is observable and will notify on all changes.
 var grid = ObservGrid([0,1,2,3,4,5], [2,3])
 var removeListener = grid(function(value){
   // value is a new instance of ArrayGrid with the updated data
+  console.log(value._diff) //= [[0,1], 1, 'A']
   console.log(value.get(0, 1)) //= 'A'
   console.log(value.data) //= ['A', 1, 2, 3, 4, 5]
 })

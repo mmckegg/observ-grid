@@ -39,7 +39,14 @@ module.exports = function(data, shape, stride){
   }
 
   var releases = [
-    self.data(update),
+    self.data(function(value){
+      var diff = value._diff
+      var result = ArrayGrid(self.data(), self.shape(), self.stride())
+      if (diff){
+        result._diff = [self.coordsAt(diff[0]), diff[1]].concat(diff.slice(2))
+      }
+      set(result)
+    }),
     self.shape(update),
     self.stride(update)
   ]

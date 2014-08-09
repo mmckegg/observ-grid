@@ -5,7 +5,7 @@ var ArrayGrid = require('array-grid')
 
 test(function(t){
 
-  t.plan(17)
+  t.plan(18)
 
   var grid = ObservGrid([0,1,2,3,4,5], [2,3])
   // 0 1 2
@@ -22,6 +22,7 @@ test(function(t){
     }),
     grid(function(value){
       t.ok(value instanceof ArrayGrid, 'emits fresh instance of array grid')
+      t.same(value._diff, [[0, 1], 1, 'A'])
       t.same(value.data, [0,'A',2,3,4,5])
       t.equal(value.get(0,1), 'A')
       t.same(value.lookup('A'), [0,1])
@@ -63,7 +64,7 @@ test(function(t){
 })
 
 test('nested observ', function(t){
-  t.plan(9)
+  t.plan(10)
   var inner = Observ(0)
   var grid = ObservGrid([inner,1,2,3,4,5], [2,3])
 
@@ -77,6 +78,7 @@ test('nested observ', function(t){
       t.same(value, ['A',1,2,3,4,5])
     }),
     grid(function(value){
+      t.same(value._diff, [ [0,0], 1, 'A' ])
       t.equal(value.get(0,0), 'A')
     })
   ]
