@@ -1,0 +1,33 @@
+{
+  "name": "observ-grid",
+  "version": "0.0.0",
+  "description": "An observable array-grid.",
+  "main": "index.js",
+  "scripts": {
+    "test": "tape test/*.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mmckegg/observ-grid.git"
+  },
+  "keywords": [
+    "grid",
+    "observ",
+    "array",
+    "ndarray"
+  ],
+  "author": "Matt McKegg",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mmckegg/observ-grid/issues"
+  },
+  "homepage": "https://github.com/mmckegg/observ-grid",
+  "dependencies": {
+    "array-grid": "^1.2.0",
+    "observ": "^0.2.0",
+    "observ-array": "^1.2.0"
+  },
+  "devDependencies": {
+    "tape": "^2.14.0"
+  }
+}
