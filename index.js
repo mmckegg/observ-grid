@@ -28,6 +28,10 @@ module.exports = function(data, shape, stride){
     return self().lookup(value)
   }
 
+  self.coordsAt = function(index){
+    return self().coordsAt(index)
+  }
+
   self.place = function(originRow, originCol, array){
     var grid = ArrayGrid(self.data().concat(), self.shape(), self.stride())
     grid.place(originRow, originCol, array)
