@@ -1,6 +1,7 @@
 var Observ = require('observ')
 var ObservArray = require('observ-array')
 var ArrayGrid = require('array-grid')
+var fixedPut = require('./fixed-put')
 
 module.exports = function(data, shape, stride){
 
@@ -10,10 +11,16 @@ module.exports = function(data, shape, stride){
   self.shape = ObservArray(shape)
   self.stride = ObservArray(stride || [shape[1], 1])
 
+  // monkey patch ObservArray until pull request applied
+  // https://github.com/Raynos/observ-array/pull/10
+  self.data.put = fixedPut
+
   var set = self.set
 
   self.set = function(row, col, value){
-    self.data.put(self.index(row, col), value)
+    if (row >= 0 && row < self.shape()[0] && col >= 0 && col < self.shape()[1]){
+      self.data.put(self.index(row, col), value)
+    }
   }
 
   self.get = function(row, col, value){
@@ -38,7 +45,7 @@ module.exports = function(data, shape, stride){
     self.data.set(grid.data)
   }
 
-  var releases = [
+  self._removeListeners = [
     self.data(function(value){
       var diff = value._diff
       var result = ArrayGrid(self.data(), self.shape(), self.stride())

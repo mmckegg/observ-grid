@@ -105,6 +105,14 @@ test('nested observ', function(t){
   t.end()
 })
 
+test('set beyond internal data.length', function(t){
+  var grid = ObservGrid([0], [2,3])
+  grid.set(1,2, 'Z')
+  t.equal(grid.get(1,2), 'Z')
+  t.same(grid.data(), [0,,,,,'Z'])
+  t.end()
+})
+
 function invoke(f){
   return f()
 }
