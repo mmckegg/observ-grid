@@ -5,7 +5,7 @@ An observable array-grid.
 
 Allows all the same operations as [array-grid](https://github.com/mmckegg/array-grid), but is [observable](https://github.com/raynos/observ-array).
 
-## Install via [npm](https://npmjs.org/packages/observ-grid)
+## Install via [npm](https://npmjs.org/package/observ-grid)
 
 ```bash
 $ npm install observ-grid
