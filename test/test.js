@@ -22,7 +22,7 @@ test(function(t){
     }),
     grid(function(value){
       t.ok(value instanceof ArrayGrid, 'emits fresh instance of array grid')
-      t.same(value._diff, [[0, 1], 1, 'A'])
+      t.same(value._diff, [[0, 1, 'A']])
       t.same(value.data, [0,'A',2,3,4,5])
       t.equal(value.get(0,1), 'A')
       t.same(value.lookup('A'), [0,1])
@@ -78,7 +78,7 @@ test('nested observ', function(t){
       t.same(value, ['A',1,2,3,4,5])
     }),
     grid(function(value){
-      t.same(value._diff, [ [0,0], 1, 'A' ])
+      t.same(value._diff, [ [ 0,0, 'A' ] ])
       t.equal(value.get(0,0), 'A')
     })
   ]
@@ -111,6 +111,65 @@ test('set beyond internal data.length', function(t){
   t.equal(grid.get(1,2), 'Z')
   t.same(grid.data(), [0,,,,,'Z'])
   t.end()
+})
+
+test('batch changes on `place`', function(t){
+  var grid = ObservGrid([0,0,0,0,'Z',0], [2,3])
+  var inner = ArrayGrid([1,2,'Z',3], [2,2])
+
+  var changes = []
+  grid(function(change){
+    changes.push(change)
+  })
+
+  grid.place(0, 1, inner)
+
+
+  t.equal(changes.length, 1, 'change count')
+  t.same(changes[0].data, [
+    0,  1,  2,
+    0, 'Z', 3
+  ])
+
+  t.same(changes[0]._diff, [
+    [0,1, 1],
+    [0,2, 2],
+    [1,1, 'Z'], //TODO: should not be emitted as this is not a change
+    [1,2, 3]
+  ])
+
+  t.end()
+
+})
+
+test('transaction batch changes', function(t){
+  var grid = ObservGrid([0,0,0,0,0,0], [2,3])
+  var changes = []
+  grid(function(change){
+    changes.push(change)
+  })
+
+  grid.transaction(function(t){
+    t.set(0, 1, 'A')
+    t.set(1, 1, 'B')
+    t.place(0, 2, ArrayGrid(['C','D'], [2,1]))
+  })
+
+  t.equal(changes.length, 1, 'change count')
+  t.same(changes[0].data, [
+    0, 'A', 'C',
+    0, 'B', 'D'
+  ])
+
+  t.same(changes[0]._diff, [
+    [0,1, 'A'],
+    [1,1, 'B'],
+    [0,2, 'C'],
+    [1,2, 'D']
+  ])
+
+  t.end()
+
 })
 
 function invoke(f){

@@ -2,19 +2,25 @@ var Observ = require('observ')
 var ObservArray = require('observ-array')
 var ArrayGrid = require('array-grid')
 
-module.exports = function(data, shape, stride){
+module.exports = ObservGrid
+
+function ObservGrid(data, shape, stride){
 
   var self = Observ()
 
-  self.data = ObservArray(data)
+  self.data = typeof data == 'function' ? data : ObservArray(data)
   self.shape = ObservArray(shape)
   self.stride = ObservArray(stride || [shape[1], 1])
 
+  // monkey patch data with transaction until native observ-array support
+  self.data.transaction = require('./array-transaction.js')
 
-  var set = self.set
+  self._set = self.set
+
+  var lastValue = ArrayGrid(self.data(), self.shape(), self.stride())
 
   self.set = function(row, col, value){
-    if (row >= 0 && row < self.shape()[0] && col >= 0 && col < self.shape()[1]){
+    if (row >= 0 && row < lastValue.shape[0] && col >= 0 && col < lastValue.shape[1]){
       self.data.put(self.index(row, col), value)
     }
   }
@@ -24,31 +30,49 @@ module.exports = function(data, shape, stride){
   }
 
   self.index = function(row, col){
-    return self().index(row, col)
+    return lastValue.index(row, col)
   }
 
   self.lookup = function(value){
-    return self().lookup(value)
+    return lastValue.lookup(value)
   }
 
   self.coordsAt = function(index){
-    return self().coordsAt(index)
+    return lastValue.coordsAt(index)
   }
 
   self.place = function(originRow, originCol, array){
-    var grid = ArrayGrid(self.data().concat(), self.shape(), self.stride())
-    grid.place(originRow, originCol, array)
-    self.data.set(grid.data)
+    self.data.transaction(function(t){
+      for (var r=0;r<array.shape[0];r++){
+        for (var c=0;c<array.shape[1];c++){
+          var index = lastValue.index(originRow + r, originCol + c)
+          if (index != null){
+            t.put(index, array.get(r, c))
+          }
+        }
+      }
+    })
+  }
+
+  self.transaction = function(func){
+    self.data.transaction(function(data){
+      var grid = ObservGrid(data, self.shape(), self.stride())
+      func(grid)
+    })
   }
 
   self._removeListeners = [
     self.data(function(value){
-      var diff = value._diff
-      var result = ArrayGrid(self.data(), self.shape(), self.stride())
-      if (diff){
-        result._diff = [self.coordsAt(diff[0]), diff[1]].concat(diff.slice(2))
+      var diffs = value._diff ? [value._diff] : value._diffs
+      var result = ArrayGrid(value, self.shape(), self.stride())
+      if (diffs){
+        result._diff = diffs.map(function(diff){
+          var coords = self.coordsAt(diff[0])
+          return [coords[0], coords[1], diff[2]]
+        })
       }
-      set(result)
+      lastValue = result
+      self._set(result)
     }),
     self.shape(update),
     self.stride(update)
@@ -61,6 +85,7 @@ module.exports = function(data, shape, stride){
   /// scoped
 
   function update(){
-    set(ArrayGrid(self.data(), self.shape(), self.stride()))
+    lastValue = ArrayGrid(self.data(), self.shape(), self.stride())
+    self._set(lastValue)
   }
 }

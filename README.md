@@ -48,7 +48,11 @@ Lookup the `[row,col]` coordinates of the specified 1d `index`.
 
 ### `grid.place(originRow, originCol, array)`
 
-Stamp another ArrayGrid or two-dimensional ndarray starting at the origin specified. Notifies all observers.
+Stamp another ArrayGrid or two-dimensional ndarray starting at the origin specified. Batches changes then notifies all observers.
+
+### `grid.transaction(func)`
+
+Batch changes together. `func` will be called with a copy of the grid which can be modified. On return, all changes will be merged into the `grid` and a single observ notification will be triggered.
 
 ## Observable Attributes
 
@@ -60,7 +64,7 @@ The grid itself is observable and will notify on all changes.
 var grid = ObservGrid([0,1,2,3,4,5], [2,3])
 var removeListener = grid(function(value){
   // value is a new instance of ArrayGrid with the updated data
-  console.log(value._diff) //= [[0,1], 1, 'A']
+  console.log(value._diff) //= [ [0, 1, 'A'] ]
   console.log(value.get(0, 1)) //= 'A'
   console.log(value.data) //= ['A', 1, 2, 3, 4, 5]
 })
