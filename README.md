@@ -52,7 +52,7 @@ Stamp another ArrayGrid or two-dimensional ndarray starting at the origin specif
 
 ### `grid.transaction(func)`
 
-Batch changes together. `func` will be called with a copy of the grid which can be modified. On return, all changes will be merged into the `grid` and a single observ notification will be triggered.
+Batch changes together. `func` will be called with a mutable ArrayGrid which can be modified. On return, the data will be diffed against original and merged into the `grid`. A single observ notification will be triggered.
 
 ## Observable Attributes
 

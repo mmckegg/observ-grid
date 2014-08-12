@@ -134,7 +134,6 @@ test('batch changes on `place`', function(t){
   t.same(changes[0]._diff, [
     [0,1, 1],
     [0,2, 2],
-    [1,1, 'Z'], //TODO: should not be emitted as this is not a change
     [1,2, 3]
   ])
 
@@ -163,8 +162,8 @@ test('transaction batch changes', function(t){
 
   t.same(changes[0]._diff, [
     [0,1, 'A'],
-    [1,1, 'B'],
     [0,2, 'C'],
+    [1,1, 'B'],
     [1,2, 'D']
   ])
 

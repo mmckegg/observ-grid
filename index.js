@@ -42,12 +42,12 @@ function ObservGrid(data, shape, stride){
   }
 
   self.place = function(originRow, originCol, array){
-    self.data.transaction(function(t){
+    self.data.transaction(function(rawList){
       for (var r=0;r<array.shape[0];r++){
         for (var c=0;c<array.shape[1];c++){
           var index = lastValue.index(originRow + r, originCol + c)
           if (index != null){
-            t.put(index, array.get(r, c))
+            rawList[index] = array.get(r, c)
           }
         }
       }
@@ -56,7 +56,7 @@ function ObservGrid(data, shape, stride){
 
   self.transaction = function(func){
     self.data.transaction(function(data){
-      var grid = ObservGrid(data, self.shape(), self.stride())
+      var grid = ArrayGrid(data, self.shape(), self.stride())
       func(grid)
     })
   }
@@ -66,9 +66,12 @@ function ObservGrid(data, shape, stride){
       var diffs = value._diff ? [value._diff] : value._diffs
       var result = ArrayGrid(value, self.shape(), self.stride())
       if (diffs){
-        result._diff = diffs.map(function(diff){
-          var coords = self.coordsAt(diff[0])
-          return [coords[0], coords[1], diff[2]]
+        result._diff = []
+        diffs.forEach(function(diff){
+          diff.slice(2).forEach(function(v, i){
+            var coords = self.coordsAt(diff[0]+i)
+            result._diff.push([coords[0], coords[1], v])
+          })
         })
       }
       lastValue = result
