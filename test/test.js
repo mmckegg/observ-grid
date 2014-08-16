@@ -141,6 +141,36 @@ test('batch changes on `place`', function(t){
 
 })
 
+test('data.splice emits multiple changes on value._diff', function(t){
+  var grid = ObservGrid([1,2,3,4,5,6], [2,3])
+  // 1 2 3
+  // 4 5 6
+
+  var changes = []
+  grid(function(change){
+    changes.push(change)
+  })
+
+  grid.data.splice(1,3, 'A')
+
+  t.equal(changes.length, 1, 'change count')
+  t.same(changes[0].data, [
+    1, 'A', 5,
+    6
+  ])
+
+  t.same(changes[0]._diff, [
+    [0,1, 'A'],
+    [0,2, 5],
+    [1,0, 6],
+    [1,1, undefined],
+    [1,2, undefined]
+  ])
+
+  t.end()
+
+})
+
 test('transaction batch changes', function(t){
   var grid = ObservGrid([0,0,0,0,0,0], [2,3])
   var changes = []

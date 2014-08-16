@@ -67,11 +67,23 @@ function ObservGrid(data, shape, stride){
       var result = ArrayGrid(value, self.shape(), self.stride())
       if (diffs){
         result._diff = []
-        diffs.forEach(function(diff){
-          diff.slice(2).forEach(function(v, i){
+        diffs.some(function(diff){
+          var length = diff.length-2
+          for (var i=0;i<length;i++){
             var coords = self.coordsAt(diff[0]+i)
-            result._diff.push([coords[0], coords[1], v])
-          })
+            result._diff.push([coords[0], coords[1], diff[i+2]])
+          }
+          if (diff[1] !== length){
+            // manually handle unbalanced splice
+            var maxLength = Math.max(lastValue.data.length, result.data.length)
+            for (var i=diff[0]+length;i<maxLength;i++){
+              if (result.data[i] !== lastValue.data[i]){
+                var coords = self.coordsAt(i)
+                result._diff.push([coords[0], coords[1], result.data[i]])
+              }
+            }
+            return true // bail out
+          }
         })
       }
       lastValue = result
