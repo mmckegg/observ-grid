@@ -12,9 +12,6 @@ function ObservGrid(data, shape, stride){
   self.shape = ObservArray(shape)
   self.stride = ObservArray(stride || [shape[1], 1])
 
-  // monkey patch data with transaction until native observ-array support
-  self.data.transaction = require('./array-transaction.js')
-
   self._set = self.set
 
   var lastValue = ArrayGrid(self.data(), self.shape(), self.stride())
@@ -63,7 +60,7 @@ function ObservGrid(data, shape, stride){
 
   self._removeListeners = [
     self.data(function(value){
-      var diffs = value._diff ? [value._diff] : value._diffs
+      var diffs = value._diff
       var result = ArrayGrid(value, self.shape(), self.stride())
       if (diffs){
         result._diff = []

@@ -17,12 +17,12 @@ test(function(t){
   // set
   var removeListeners = [
     grid.data(function(value){
-      t.same(value._diff, [1, 1, 'A'])
+      t.same(value._diff, [ [1, 1, 'A'] ])
       t.same(value, [0,'A',2,3,4,5])
     }),
     grid(function(value){
       t.ok(value instanceof ArrayGrid, 'emits fresh instance of array grid')
-      t.same(value._diff, [[0, 1, 'A']])
+      t.same(value._diff, [ [0, 1, 'A'] ])
       t.same(value.data, [0,'A',2,3,4,5])
       t.equal(value.get(0,1), 'A')
       t.same(value.lookup('A'), [0,1])
@@ -74,7 +74,7 @@ test('nested observ', function(t){
       t.equal(value, 'A')
     }),
     grid.data(function(value){
-      t.same(value._diff, [ 0, 1, 'A' ])
+      t.same(value._diff, [ [ 0, 1, 'A' ] ])
       t.same(value, ['A',1,2,3,4,5])
     }),
     grid(function(value){
@@ -92,7 +92,7 @@ test('nested observ', function(t){
       t.ok(false, 'this should not get called')
     }),
     grid.data(function(value){
-      t.same(value._diff, [ 0, 1, 'B' ])
+      t.same(value._diff, [ [ 0, 1, 'B' ] ])
       t.same(value, ['B',1,2,3,4,5])
     }),
     grid(function(value){
