@@ -59,33 +59,26 @@ function ObservGrid(data, shape, stride){
   }
 
   self._removeListeners = [
+  
     self.data(function(value){
-      var diffs = value._diff
-      var result = ArrayGrid(value, self.shape(), self.stride())
-      if (diffs){
-        result._diff = []
-        diffs.some(function(diff){
-          var length = diff.length-2
-          for (var i=0;i<length;i++){
-            var coords = self.coordsAt(diff[0]+i)
-            result._diff.push([coords[0], coords[1], diff[i+2]])
+      var shape = self.shape()
+      var result = ArrayGrid(value, shape, self.stride())
+      var length = shape[0] * shape[1]
+      var diffs = result._diff = []
+
+      for (var i=0;i<length;i++){
+        if (result.data[i] !== lastValue.data[i]){
+          var coords = self.coordsAt(i)
+          if (coords){
+            diffs.push([coords[0], coords[1], result.data[i]])
           }
-          if (diff[1] !== length){
-            // manually handle unbalanced splice
-            var maxLength = Math.max(lastValue.data.length, result.data.length)
-            for (var i=diff[0]+length;i<maxLength;i++){
-              if (result.data[i] !== lastValue.data[i]){
-                var coords = self.coordsAt(i)
-                result._diff.push([coords[0], coords[1], result.data[i]])
-              }
-            }
-            return true // bail out
-          }
-        })
+        }
       }
+
       lastValue = result
       self._set(result)
     }),
+
     self.shape(update),
     self.stride(update)
   ]

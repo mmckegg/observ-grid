@@ -179,6 +179,7 @@ test('transaction batch changes', function(t){
   })
 
   grid.transaction(function(t){
+    t.data[0] = 'X'
     t.set(0, 1, 'A')
     t.set(1, 1, 'B')
     t.place(0, 2, ArrayGrid(['C','D'], [2,1]))
@@ -186,11 +187,12 @@ test('transaction batch changes', function(t){
 
   t.equal(changes.length, 1, 'change count')
   t.same(changes[0].data, [
-    0, 'A', 'C',
+    'X', 'A', 'C',
     0, 'B', 'D'
   ])
 
   t.same(changes[0]._diff, [
+    [0,0, 'X'],
     [0,1, 'A'],
     [0,2, 'C'],
     [1,1, 'B'],
@@ -200,6 +202,59 @@ test('transaction batch changes', function(t){
   t.end()
 
 })
+
+test('splice grid data diff', function(t){
+  var grid = ObservGrid([0,1,2,3,4,5], [3,2])
+  var changes = []
+  grid(function(change){
+    changes.push(change)
+  })
+
+  grid.transaction(function(raw){
+    raw.data.splice(1,1)
+    raw.data.splice(3,0, 'test')
+  })
+
+  t.equal(changes.length, 1, 'change count')
+  t.same(changes[0].data, [0,2, 3, 'test', 4, 5])
+
+  t.same(changes[0]._diff, [
+    [0,1, 2],
+    [1,0, 3],
+    [1,1, 'test']
+  ])
+
+  t.end()
+
+})
+
+test('set beyond internal data array then transact back', function(t){
+  var grid = ObservGrid([,,,], [2,2])
+
+  var changes = []
+  grid(function(change){
+    changes.push(change)
+  })
+
+  grid.set(0,1, 'hello')
+  grid.transaction(function(raw){
+    raw.data[0] = 'data'
+    raw.set(1,0, 'test')  
+    raw.set(1,1, 'test2') 
+  })
+
+  t.equal(changes.length, 2, 'change count')
+  t.same(changes[1].data, ['data', 'hello', 'test', 'test2'])
+
+  t.same(changes[1]._diff, [
+    [0,0, 'data'],
+    [1,0, 'test'],
+    [1,1, 'test2']
+  ])
+
+  t.end()
+})
+
 
 function invoke(f){
   return f()
