@@ -1,6 +1,6 @@
 {
   "name": "observ-grid",
-  "version": "2.7.0",
+  "version": "2.8.0",
   "description": "An observable array-grid.",
   "main": "index.js",
   "scripts": {
