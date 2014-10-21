@@ -10,7 +10,7 @@ function ObservGrid(data, shape, stride){
 
   self.data = typeof data == 'function' ? data : ObservArray(data)
   self.shape = typeof shape == 'function' ? shape : ObservArray(shape)
-  self.stride = typeof stride == 'function' ? stride : ObservArray(stride || [shape[1], 1])
+  self.stride = typeof stride == 'function' ? stride : ObservArray(stride || [self.shape()[1], 1])
 
   self._set = self.set
 
