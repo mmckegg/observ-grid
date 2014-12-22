@@ -88,12 +88,7 @@ module.exports = function ObservGridGrabber(grid){
 
   function grab(obj, handler){
     if (!arguments.length){
-      var top = grabs[grabs.length-1]
-      if (top){
-        return top.grid()
-      } else {
-        return grid()
-      }
+      return grid()
     } else if (typeof obj == 'function' && !handler){
       handler = obj
       return doGrab({handler: handler})
