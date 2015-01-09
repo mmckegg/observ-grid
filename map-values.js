@@ -10,7 +10,7 @@ function mapGridValues(grid, trueValue){
     }
   }
 
-  return computed([grid], function(source){
+  return computed([grid], function computeMapGridValues(source){
     if (source){
       return ArrayGrid(source.data.map(mapColor), source.shape, source.stride)
     }
