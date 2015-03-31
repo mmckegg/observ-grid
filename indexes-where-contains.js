@@ -11,9 +11,11 @@ function computedIndexesWhereContains(observable, match){
 }
 
 function appendIndexIfMatch(value, index){
-  var target = this.target
-  var match = this.match
-  if (~value.indexOf(match)){
-    target.push(index)
+  if (value){
+    var target = this.target
+    var match = this.match
+    if (~value.indexOf(match)){
+      target.push(index)
+    }
   }
 }
