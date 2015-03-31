@@ -2,18 +2,28 @@ var ObservGrid = require('./')
 
 module.exports = function ObservGridGrabber(grid){
   var grabs = []
+  var lastData = grid() && grid().data || []
 
   grab.remove = grid(function(value){
-    if (value._diff){
-      update(value._diff)
+    var length = value.shape[0] * value.shape[1]
+    var changes = []
+    for (var i=0;i<length;i++){
+      if (lastData[i] !== value.data[i]){
+        var coords = value.coordsAt(i)
+        changes.push([coords[0], coords[1], value.data[i]])
+      }
     }
+
+    lastData = value.data
+    update(changes)
   })
 
   return grab
 
   function update(diffs, fromIndex){
     var assigned = []
-    var length = grid.shape()[0] * grid.shape()[1]
+    var shape = grid().shape
+    var length = shape[0] * shape[1]
     grabs.forEach(function(obj, i){
       if (!fromIndex || i >= fromIndex){
         var changes = []
@@ -39,7 +49,7 @@ module.exports = function ObservGridGrabber(grid){
     var changes = []
     obj.grid.data.forEach(function(val, i){
       if (includesIndex(obj, i)){
-        var coords = grid.coordsAt(i)
+        var coords = grid().coordsAt(i)
         changes.push([coords[0], coords[1], val])
       }
     })
@@ -48,7 +58,7 @@ module.exports = function ObservGridGrabber(grid){
 
   function getIndex(coords){
     if (Array.isArray(coords)){
-      return grid.index(coords[0], coords[1])
+      return grid().index(coords[0], coords[1])
     } else {
       return coords
     }
@@ -65,10 +75,10 @@ module.exports = function ObservGridGrabber(grid){
         }
       }
     } else {
-      values = grid.data()
+      values = current.data
     }
 
-    obj.grid = ObservGrid(values, grid.shape(), grid.stride())
+    obj.grid = ObservGrid(values, current.shape, current.stride)
     var releaseGrabHandler = obj.grid(obj.handler)
 
     grabs.unshift(obj)
