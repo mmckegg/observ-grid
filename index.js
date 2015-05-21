@@ -7,6 +7,8 @@ module.exports = ObservGrid
 function ObservGrid(data, shape, stride){
 
   var self = Observ()
+  self._type = 'observ-grid'
+  obs._version = '2'
 
   self.data = typeof data == 'function' ? data : ObservArray(data)
   self.shape = typeof shape == 'function' ? shape : ObservArray(shape)

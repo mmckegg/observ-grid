@@ -26,7 +26,7 @@
     "adiff": "^0.2.12",
     "array-grid": "^1.4.0",
     "observ": "^0.2.0",
-    "observ-array": "^2.0.0"
+    "observ-array": "^3.2.1"
   },
   "devDependencies": {
     "tape": "^2.14.0"
